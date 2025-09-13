@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "firebase": "^12.2.1",
-    "react": "17.0.2",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-native": "0.68.2",
     "react-native-paper": "^5.14.5"
   },
