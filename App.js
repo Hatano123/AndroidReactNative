@@ -2,7 +2,12 @@ import * as React from 'react';
 import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { ProfileProvider } from './context/ProfileContext';
+
+import MyPageScreen from './screens/MyPageScreen';
+import EditProfileScreen from './screens/EditProfileScreen';
 
 // 仮画面コンポーネント
 function TimelineScreen() {
@@ -21,11 +26,14 @@ function RecordScreen() {
   );
 }
 
-function MyPageScreen() {
+const MyPageStack = createNativeStackNavigator();
+
+function MyPageStackScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>マイページ画面</Text>
-    </View>
+    <MyPageStack.Navigator screenOptions={{ headerShown: false }}>
+      <MyPageStack.Screen name="MyPage" component={MyPageScreen} />
+      <MyPageStack.Screen name="EditProfile" component={EditProfileScreen} />
+    </MyPageStack.Navigator>
   );
 }
 
@@ -33,34 +41,22 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <PaperProvider>
-      <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={{
-            headerShown: false,
-            tabBarActiveTintColor: '#4CAF50',
-            tabBarStyle: { backgroundColor: '#fff' },
-          }}
-        >
-          <Tab.Screen name="タイムライン" component={TimelineScreen} />
-          <Tab.Screen name="記録" component={RecordScreen} />
-          <Tab.Screen name="マイページ" component={MyPageScreen} />
-        </Tab.Navigator>
-      </NavigationContainer>
-    </PaperProvider>
+    <ProfileProvider>
+      <PaperProvider>
+        <NavigationContainer>
+          <Tab.Navigator
+            screenOptions={{
+              headerShown: false,
+              tabBarActiveTintColor: '#4CAF50',
+              tabBarStyle: { backgroundColor: '#fff' },
+            }}
+          >
+            <Tab.Screen name="タイムライン" component={TimelineScreen} />
+            <Tab.Screen name="記録" component={RecordScreen} />
+            <Tab.Screen name="マイページ" component={MyPageStackScreen} />
+          </Tab.Navigator>
+        </NavigationContainer>
+      </PaperProvider>
+    </ProfileProvider>
   );
 }
-import {Text, View} from 'react-native';
-
-const HelloWorldApp = () => {
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-      <Text>Hello, world!</Text>
-    </View>
-  );
-};
