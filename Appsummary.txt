@@ -1,0 +1,381 @@
+承知いたしました。React NativeとFirebaseを使った場合の、AIコーディング支援ツール向けプロンプトを作成します。
+
+Flutterのプロンプトから、React Nativeで標準的に使われるライブラリやコンポーネント名に合わせて調整しました。
+
+プロンプト例 (React Native版)
+これから、React NativeとFirebaseを使用して、禁欲をサポートする自己改善アプリを開発します。以下にアプリの全体構成と各画面の仕様を記述するので、これに基づいてコードを生成してください。
+
+# プロジェクト概要
+
+アプリ名: Abstinence Journey (仮)
+
+目的: ユーザーが自慰行為を記録し、コミュニティと交流することで禁欲を継続するモチベーションを維持するためのアプリ。
+
+技術スタック:
+
+フロントエンド: React Native (Expo)
+
+ナビゲーション: React Navigation
+
+バックエンド: Firebase (Authentication, Firestore, Storage)
+
+デザイン: 全体的に白やライトグリーンを基調とした、清潔感のある明るいデザイン。UIコンポーネントライブラリとして React Native Paper の利用を検討。
+
+# データベース設計 (Firestore)
+
+users (コレクション)
+
+{userId} (ドキュメント)
+
+nickname: string
+
+iconUrl: string
+
+title: string
+
+streak: number
+
+...
+
+createdAt: timestamp
+
+friends (サブコレクション)
+
+{friendId} (ドキュメント)
+
+friendSince: timestamp
+
+posts (コレクション)
+
+{postId} (ドキュメント)
+
+userId: string
+
+authorNickname: string
+
+authorIconUrl: string
+
+authorTitle: string
+
+status: 'success' | 'failure'
+
+comment: string
+
+timestamp: timestamp
+
+likesCount: number (いいねの総数)
+
+likes (サブコレクション)
+
+{userId} (ドキュメント)
+
+timestamp: timestamp
+
+records (コレクション)
+
+{recordId} (ドキュメント)
+
+userId: string
+
+date: timestamp
+
+minutes: number
+
+...
+
+friendRequests (コレクション)
+
+この構成は非常に一般的で効率的なので、このままで全く問題ありません。
+
+# 全体構成
+
+3つの主要画面（タイムライン、記録、マイページ）を持つ。
+
+React NavigationのBottom Tab Navigatorを使用して、画面下部にタブバーを配置し、各画面に遷移する。
+
+# 画面仕様
+
+1. タイムライン画面 (TimelineScreen.js)
+レイアウト:
+
+画面上部にMaterial Top Tab Navigatorを配置し、「公開タイムライン」と「フレンドタイムライン」を切り替える。
+
+画面下部にはFlatListで投稿を表示する。
+
+投稿ボタンを右下に配置（TouchableOpacityを円形にスタイリング）。
+
+投稿アイテムのUI:
+
+円形のImage (アイコン), Text (ニックネーム), Text (称号), Text (コメント), Text (投稿時間)をコンポーネント化して表示。
+
+投稿アイテムの左端に、statusに応じて緑色または赤色のView（縦線）を表示する。
+
+機能:
+
+「公開」タブ: postsコレクションの全ドキュメントを新着順にFlatListで表示。
+
+「フレンド」タブ: 自分のfriendsサブコレクションでstatusが"accepted"のユーザーの投稿のみを新着順にFlatListで表示。
+
+投稿ボタンをタップすると、status("成功"/"失敗")を選択するUIと、commentを入力するTextInputを持つModalが表示される。投稿は1日2回まで。
+
+2. 記録画面 (RecordScreen.js)
+レイアウト:
+
+react-native-calendarsライブラリのカレンダービューをメインに配置。
+
+カレンダーの下に、選択した週/月の統計サマリー（合計回数、平均時間など）を表示するエリアを設ける。
+
+機能:
+
+カレンダーの日付をタップすると、その日の記録を入力/編集するModalが表示される。
+
+Modalでは、行為の時間（分）を入力する。
+
+ユーザーは目標（例: 週に2回まで、平均時間を10分未満にする）を設定できる。目標達成度をサマリーエリアで可視化する。
+
+3. マイページ画面 (MyPageScreen.js)
+レイアウト:
+
+上部にユーザーアイコンとニックネームを表示。
+
+「現在の連続記録」「最長記録」などの主要な統計情報を表示。
+
+「称号一覧」を表示するセクション。
+
+「フレンド管理」セクションを設ける。
+
+機能:
+
+プロフィール編集: ニックネームとアイコンを変更できる。
+
+称号機能: 連続記録や合計記録日数に応じて、自動的に称号が付与される。例：「3日の旅人」「鋼の意志」など。
+
+フレンド機能:
+
+自分の固有ID（uidを元にした分かりやすい文字列）を表示し、コピーできる。
+
+他のユーザーのIDを検索してフレンド申請を送信できる。
+
+自分に来たフレンド申請を一覧で表示し、承認/拒否できる。
+
+# 最初のステップ
+まず、Expoプロジェクトのセットアップ、Firebaseの初期設定、そしてReact Navigationを導入し、Bottom Tab Navigatorを持つ基本的な画面構成（App.js）から作成を開始してください。
+
+
+
+
+
+
+基本的な画面のUIだけを作成するプロンプトを書いて
+
+
+
+思考プロセスを表示
+はい、承知いたしました。
+ロジックやFirebaseとの連携は含めず、React Nativeでの基本的な画面UI（レイアウトと静的なコンポーネント）の作成に特化した、AIコーディング支援ツール向けのプロンプトを作成します。
+
+プロンプト例 (UI作成特化版)
+これから、React Native (Expo) を使用して、自己改善アプリの基本的なUI構造を作成します。このタスクでは、ロジック、状態管理(useStateなど)、Firebase連携は一切実装せず、静的なUIコンポーネントの配置のみを行ってください。 モックデータを使用して、画面の見た目を完成させることが目的です。
+
+# プロジェクト概要
+
+フレームワーク: React Native (Expo)
+
+ナビゲーション: React Navigation
+
+UIライブラリ: React Native Paper (任意)
+
+目的: 3つの主要画面（タイムライン, 記録, マイページ）の静的なUIをコンポーネントとして作成する。
+
+# 全体構成
+React NavigationのBottom Tab Navigatorを使用して、3つのタブを持つメインナビゲーションをApp.jsに作成してください。各タブには適切なアイコン（例: MaterialCommunityIcons）を設定します。
+
+タブ1: タイムライン画面
+
+タブ2: 記録画面
+
+タブ3: マイページ画面
+
+# 画面仕様
+
+1. タイムライン画面 (TimelineScreen.js)
+画面上部に「公開」「フレンド」を切り替えるためのMaterial Top Tab Navigatorを配置します。
+
+各タブ内には、投稿を一覧表示するためのFlatListを配置します。
+
+以下のモックデータを配列として定義し、FlatListで表示してください。
+
+JavaScript
+
+const mockPosts = [
+  { id: '1', nickname: 'Taro', title: '鋼の意志', status: 'success', comment: '今日も一日頑張った！', icon: 'https://placehold.jp/150x150.png' },
+  { id: '2', nickname: 'Jiro', title: '3日の旅人', status: 'failure', comment: '明日からまた切り替える。', icon: 'https://placehold.jp/150x150.png' },
+  { id: '3', nickname: 'Saburo', title: '初心', status: 'success', comment: '良いスタートが切れた。', icon: 'https://placehold.jp/150x150.png' },
+];
+投稿アイテムコンポーネント (PostItem.js) を作成してください。
+
+左端にstatusに応じて緑色か赤色の縦線 (View) を表示します。
+
+Image (円形アイコン), Text (ニックネーム), Text (称号), Text (コメント) をレイアウトします。
+
+右下に投稿用のFloatingActionButton（円形のボタン）を配置してください。
+
+2. 記録画面 (RecordScreen.js)
+react-native-calendarsライブラリをインストールし、画面上部に<Calendar />コンポーネントを配置してください。カレンダーのマーキングや日付選択のロジックは不要です。
+
+カレンダーの下に、統計サマリーを表示するエリアを設けてください。Textコンポーネントで以下のようなダミーの統計情報を表示します。
+
+「今週の合計: 3回」
+
+「今月の目標達成率: 80%」
+
+3. マイページ画面 (MyPageScreen.js)
+画面をいくつかのセクションに分けてレイアウトしてください。
+
+プロフィールセクション:
+
+Imageコンポーネントでユーザーアイコン（円形）を表示します。
+
+Textコンポーネントでニックネーム（例: "あなたのニックネーム"）を表示します。
+
+統計セクション:
+
+「現在の連続記録」「最長記録」のラベルと、ダミーの数字（例: "15日", "30日"）をTextで表示します。
+
+称号セクション:
+
+「獲得した称号」という見出しの下に、いくつかのダミー称号（例: 「初心」「3日の旅人」「鋼の意志」）をTextでリスト表示します。
+
+フレンドセクション:
+
+「フレンドリスト」という見出しと、ダミーのフレンド名を数名Textで表示します。
+
+# 最初のステップ
+まず、React NavigationのBottom Tab NavigatorをApp.jsに設定し、3つの空の画面コンポーネントを作成して、アプリの基本的な骨格を構築することから始めてください。
+
+
+
+
+
+
+
+これから、React Native (Expo) を使用して、自己改善アプリの基本的なUI構造を作成します。このタスクでは、ロジック、状態管理(useStateなど)、Firebase連携は一切実装せず、静的なUIコンポーネントの配置のみを行ってください。 モックデータを使用して、画面の見た目を完成させることが目的です。
+
+# プロジェクト概要
+
+
+
+フレームワーク: React Native (Expo)
+
+ナビゲーション: React Navigation
+
+UIライブラリ: React Native Paper (任意)
+
+目的: 3つの主要画面（タイムライン, 記録, マイページ）の静的なUIをコンポーネントとして作成する。
+
+# 全体構成React NavigationのBottom Tab Navigatorを使用して、3つのタブを持つメインナビゲーションをApp.jsに作成してください。各タブには適切なアイコン（例: MaterialCommunityIcons）を設定します。
+
+
+
+タブ1: タイムライン画面
+
+タブ2: 記録画面
+
+タブ3: マイページ画面
+
+# 画面仕様
+
+1. タイムライン画面 (TimelineScreen.js)
+
+画面上部に「公開」「フレンド」を切り替えるためのMaterial Top Tab Navigatorを配置します。
+
+各タブ内には、投稿を一覧表示するためのFlatListを配置します。
+
+以下のモックデータを配列として定義し、FlatListで表示してください。
+
+
+
+JavaScript
+
+
+
+const mockPosts = [
+
+{ id: '1', nickname: 'Taro', title: '鋼の意志', status: 'success', comment: '今日も一日頑張った！', icon: 'https://placehold.jp/150x150.png' },
+
+{ id: '2', nickname: 'Jiro', title: '3日の旅人', status: 'failure', comment: '明日からまた切り替える。', icon: 'https://placehold.jp/150x150.png' },
+
+{ id: '3', nickname: 'Saburo', title: '初心', status: 'success', comment: '良いスタートが切れた。', icon: 'https://placehold.jp/150x150.png' },
+
+];
+
+投稿アイテムコンポーネント (PostItem.js) を作成してください。
+
+左端にstatusに応じて緑色か赤色の縦線 (View) を表示します。
+
+Image (円形アイコン), Text (ニックネーム), Text (称号), Text (コメント) をレイアウトします。
+
+右下に投稿用のFloatingActionButton（円形のボタン）を配置してください。
+
+2. 記録画面 (RecordScreen.js)
+
+react-native-calendarsライブラリをインストールし、画面上部に<Calendar />コンポーネントを配置してください。カレンダーのマーキングや日付選択のロジックは不要です。
+
+カレンダーの下に、統計サマリーを表示するエリアを設けてください。Textコンポーネントで以下のようなダミーの統計情報を表示します。
+
+「今週の合計: 3回」
+
+「今月の目標達成率: 80%」
+
+3. マイページ画面 (MyPageScreen.js)
+
+画面をいくつかのセクションに分けてレイアウトしてください。
+
+プロフィールセクション:
+
+Imageコンポーネントでユーザーアイコン（円形）を表示します。
+
+Textコンポーネントでニックネーム（例: "あなたのニックネーム"）を表示します。
+
+統計セクション:
+
+「現在の連続記録」「最長記録」のラベルと、ダミーの数字（例: "15日", "30日"）をTextで表示します。
+
+称号セクション:
+
+「獲得した称号」という見出しの下に、いくつかのダミー称号（例: 「初心」「3日の旅人」「鋼の意志」）をTextでリスト表示します。
+
+フレンドセクション:
+
+「フレンドリスト」という見出しと、ダミーのフレンド名を数名Textで表示します。
+
+# 最初のステップ
+
+まず、React NavigationのBottom Tab NavigatorをApp.jsに設定し、3つの空の画面コンポーネントを作成して、アプリの基本的な骨格を構築することから始めてください。
+
+
+
+大まかな仕様をまとめてAIに説明するよう
+
+
+
+
+思考プロセスを表示
+はい、承知いたしました。ご提示いただいた詳細な仕様を、AIに指示を出すための簡潔な要約にまとめます。
+
+これからReact Native (Expo) を使って、自己改善アプリの静的なUIモックアップを作成します。
+
+ロジックやデータ連携は一切実装せず、モックデータを使って画面の見た目だけを構築してください。
+
+アプリの全体構造は、3つの主要画面（タイムライン・記録・マイページ）を切り替えるタブバー形式です。
+
+各画面のUI概要：
+タイムライン画面:
+画面上部に「公開」「フレンド」のタブを配置し、ユーザー投稿をリスト形式で表示します。各投稿には、成功（緑）か失敗（赤）かを示す色分けが必要です。
+
+記録画面:
+カレンダーと、その下に統計情報（例：「今週の合計: 3回」）を表示するシンプルなレイアウトです。
+
+マイページ画面:
+ユーザーのプロフィール（アイコン、名前）、達成記録（連続記録など）、獲得した称号リスト、フレンドリストを表示する画面です。
+

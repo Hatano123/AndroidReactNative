@@ -5,26 +5,58 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
 
+// デザインシステム用カラーパレット
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    primaryGreen: '#55AE3A',
+    lightGreenBackground: '#F0FFF4',
+    cardBackground: '#FFFFFF',
+    textColor: '#212121',
+    subtleTextColor: '#555555',
+    successColor: '#2E7D32',
+    failureColor: '#C62828',
+    borderColor: '#E0E0E0',
+    red: '#FF0000',
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    primaryGreen: '#55AE3A',
+    lightGreenBackground: '#1A1A1A',
+    cardBackground: '#2D2D2D',
+    textColor: '#FFFFFF',
+    subtleTextColor: '#CCCCCC',
+    successColor: '#4CAF50',
+    failureColor: '#F44336',
+    borderColor: '#404040',
+    red: '#FF0000',
   },
+  // 後方互換性のための直接アクセス
+  primaryGreen: '#55AE3A',
+  lightGreenBackground: '#F0FFF4',
+  cardBackground: '#FFFFFF',
+  textColor: '#212121',
+  subtleTextColor: '#555555',
+  successColor: '#2E7D32',
+  failureColor: '#C62828',
+  borderColor: '#E0E0E0',
+  red: '#FF0000',
+};
+
+export const CardStyle = {
+  borderRadius: 12,
+  backgroundColor: Colors.cardBackground,
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.08,
+  shadowRadius: 4,
+  elevation: 2,
+  borderWidth: 1,
+  borderColor: Colors.borderColor,
+};
+
+export const ButtonStyle = {
+  borderRadius: 8,
+  backgroundColor: Colors.primaryGreen,
 };
 
 export const Fonts = Platform.select({

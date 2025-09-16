@@ -1,112 +1,271 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import PostInputModal from '@/components/PostInputModal';
+import PostItem, { PostItemProps } from '@/components/PostItem';
+import { Colors } from '@/constants/theme';
+import { PostService } from '@/services/postService';
+import { Post } from '@/types/post';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import React, { useEffect, useState } from 'react';
+import { Alert, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { FAB, Text } from 'react-native-paper';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+const Tab = createMaterialTopTabNavigator();
 
-export default function TabTwoScreen() {
+function PublicTimeline({ posts, onRefresh, refreshing, onLike, onEdit, onDelete }: {
+  posts: Post[];
+  onRefresh: () => void;
+  refreshing: boolean;
+  onLike: (postId: string) => void;
+  onEdit: (postId: string) => void;
+  onDelete: (postId: string) => void;
+}) {
+  const convertToPostItemProps = (post: Post): PostItemProps => ({
+    id: post.id,
+    status: post.status,
+    iconUrl: post.iconUrl,
+    nickname: post.nickname,
+    title: post.title,
+    comment: post.comment,
+    timestamp: post.timestamp,
+    likes: post.likes,
+    onLike: () => onLike(post.id),
+    onEdit: (id: string) => onEdit(id),
+    onDelete: (id: string) => onDelete(id),
+    isOwner: post.userId === 'guest', // 実際の実装では認証されたユーザーIDと比較
+  });
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <FlatList
+      data={posts}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => <PostItem {...convertToPostItemProps(item)} />}
+      contentContainerStyle={{ padding: 16 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    />
+  );
+}
+
+function FriendsTimeline({ posts, onRefresh, refreshing, onLike, onEdit, onDelete }: {
+  posts: Post[];
+  onRefresh: () => void;
+  refreshing: boolean;
+  onLike: (postId: string) => void;
+  onEdit: (postId: string) => void;
+  onDelete: (postId: string) => void;
+}) {
+  const convertToPostItemProps = (post: Post): PostItemProps => ({
+    id: post.id,
+    status: post.status,
+    iconUrl: post.iconUrl,
+    nickname: post.nickname,
+    title: post.title,
+    comment: post.comment,
+    timestamp: post.timestamp,
+    likes: post.likes,
+    onLike: () => onLike(post.id),
+    onEdit: (id: string) => onEdit(id),
+    onDelete: (id: string) => onDelete(id),
+    isOwner: post.userId === 'guest', // 実際の実装では認証されたユーザーIDと比較
+  });
+
+  return (
+    <FlatList
+      data={posts}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => <PostItem {...convertToPostItemProps(item)} />}
+      contentContainerStyle={{ padding: 16 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    />
+  );
+}
+
+export default function TimelineScreen() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // 投稿を読み込み
+  const loadPosts = async () => {
+    try {
+      setLoading(true);
+      const fetchedPosts = await PostService.getPosts();
+      setPosts(fetchedPosts);
+    } catch (error) {
+      console.error('投稿の読み込みに失敗しました:', error);
+      Alert.alert('エラー', '投稿の読み込みに失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 初回読み込み
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  // リフレッシュ
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadPosts();
+    setRefreshing(false);
+  };
+
+  // 投稿作成
+  const handleSubmit = async (status: 'success' | 'failure', comment: string) => {
+    try {
+      const title = status === 'success' ? '鋼の意志' : '挑戦者';
+      await PostService.createPost({
+        status,
+        title,
+        comment,
+      });
+      
+      // 投稿一覧を更新
+      await loadPosts();
+      setModalVisible(false);
+      Alert.alert('成功', '投稿が作成されました！');
+    } catch (error) {
+      console.error('投稿の作成に失敗しました:', error);
+      Alert.alert('エラー', '投稿の作成に失敗しました');
+    }
+  };
+
+  // いいね機能
+  const handleLike = async (postId: string) => {
+    try {
+      const userId = 'guest'; // 実際の実装では認証されたユーザーIDを使用
+      const result = await PostService.toggleLike(postId, userId);
+      
+      // ローカル状態を更新
+      setPosts(prevPosts =>
+        prevPosts.map(post =>
+          post.id === postId
+            ? { ...post, likes: result.likes }
+            : post
+        )
+      );
+    } catch (error) {
+      console.error('いいねの切り替えに失敗しました:', error);
+      Alert.alert('エラー', 'いいねの切り替えに失敗しました');
+    }
+  };
+
+  // 投稿編集
+  const handleEdit = (postId: string) => {
+    // 編集機能は後で実装
+    Alert.alert('編集', '編集機能は準備中です');
+  };
+
+  // 投稿削除
+  const handleDelete = async (postId: string) => {
+    Alert.alert(
+      '投稿を削除',
+      'この投稿を削除しますか？',
+      [
+        { text: 'キャンセル', style: 'cancel' },
+        {
+          text: '削除',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await PostService.deletePost(postId);
+              await loadPosts(); // 投稿一覧を更新
+              Alert.alert('成功', '投稿が削除されました');
+            } catch (error) {
+              console.error('投稿の削除に失敗しました:', error);
+              Alert.alert('エラー', '投稿の削除に失敗しました');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>タイムライン</Text>
+      <View style={styles.tabArea}>
+        <Tab.Navigator
+          screenOptions={{
+            tabBarIndicatorStyle: { backgroundColor: Colors.primaryGreen },
+            tabBarLabelStyle: { fontWeight: 'bold' },
+            tabBarStyle: { backgroundColor: Colors.lightGreenBackground },
+          }}
+        >
+          <Tab.Screen 
+            name="Public" 
+            options={{ tabBarLabel: '公開' }}
+          >
+            {() => (
+              <PublicTimeline
+                posts={posts}
+                onRefresh={handleRefresh}
+                refreshing={refreshing}
+                onLike={handleLike}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            )}
+          </Tab.Screen>
+          <Tab.Screen 
+            name="Friends" 
+            options={{ tabBarLabel: 'フレンド' }}
+          >
+            {() => (
+              <FriendsTimeline
+                posts={posts}
+                onRefresh={handleRefresh}
+                refreshing={refreshing}
+                onLike={handleLike}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            )}
+          </Tab.Screen>
+        </Tab.Navigator>
+      </View>
+      <FAB
+        icon="plus"
+        style={styles.fab}
+        color="#fff"
+        onPress={() => setModalVisible(true)}
+      />
+      <PostInputModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onSubmit={handleSubmit}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: Colors.lightGreenBackground,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.primaryGreen,
+    marginTop: 32,
+    marginLeft: 20,
+    marginBottom: 8,
+    fontFamily: 'Nunito', // フォントは後で導入
+  },
+  tabArea: {
+    flex: 1,
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: Colors.primaryGreen,
+    borderRadius: 28,
+    elevation: 4,
   },
 });
