@@ -1,15 +1,18 @@
 import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import EditProfileModal from '@/components/EditProfileModal';
+import LoginButton from '@/components/LoginButton';
 import SocialConnections from '@/components/SocialConnections';
+import { db } from '@/constants/firebaseConfig';
 import { Colors } from '@/constants/theme';
+import { useAuth } from '@/contexts/AuthContext';
 import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
-import { db } from '../../constants/firebaseConfig';
 
 
-export default function MyPageScreen() {
+export default function IndexScreen() {
+  const { user } = useAuth();
   const [isModalVisible, setModalVisible] = useState(false);
   const [userNickname, setUserNickname] = useState('Alex');
   const [userIconUri, setUserIconUri] = useState('https://randomuser.me/api/portraits/men/1.jpg');
@@ -19,7 +22,7 @@ export default function MyPageScreen() {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const userId = 'guest';
+      const userId = user?.uid || 'guest';
       const userDocRef = doc(db, 'users', userId);
       const userDocSnap = await getDoc(userDocRef);
 
@@ -100,9 +103,12 @@ export default function MyPageScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerRow}>
           <Text style={styles.pageTitle}>マイページ</Text>
-          <TouchableOpacity style={styles.editProfileBtnHeader} onPress={() => setModalVisible(true)}>
-            <Text style={styles.editProfileText}>プロフィール編集</Text>
-          </TouchableOpacity>
+          <View style={styles.headerButtons}>
+            <LoginButton style={styles.loginButton} />
+            <TouchableOpacity style={styles.editProfileBtnHeader} onPress={() => setModalVisible(true)}>
+              <Text style={styles.editProfileText}>プロフィール編集</Text>
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.profileCard}>
           <View style={styles.profileBlock}>
@@ -153,6 +159,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 8,
     marginBottom: 8,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  loginButton: {
+    minWidth: 70,
+    paddingHorizontal: 12,
   },
   editProfileBtnHeader: {
     backgroundColor: '#555',
@@ -210,70 +225,70 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: 'left',
   },
-    card: {
-      marginHorizontal: 16,
-      marginBottom: 16,
-      padding: 16,
-    },
-    profileRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    profileIcon: {
+  card: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    padding: 16,
+  },
+  profileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileIcon: {
     width: 80,
     height: 80,
     borderRadius: 40,
     marginRight: 16,
     backgroundColor: Colors.borderColor,
     },
-    profileInfo: {
+  profileInfo: {
     marginLeft: 8,
     flex: 1,
     justifyContent: 'center',
     },
-    nicknameRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 4,
-    },
-    nickname: {
+  nicknameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  nickname: {
     fontSize: 24,
     fontWeight: 'bold',
     color: Colors.textColor,
     marginBottom: 4,
     },
-    editIcon: {
-      fontSize: 18,
-      color: Colors.primaryGreen,
-    },
-    title: {
+  editIcon: {
+    fontSize: 18,
+    color: Colors.primaryGreen,
+  },
+  title: {
     fontSize: 16,
     color: Colors.subtleTextColor,
     fontWeight: '600',
     },
-    memberSince: {
-      fontSize: 13,
-      color: Colors.subtleTextColor,
-    },
-    statsRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      marginBottom: 16,
-    },
-    statsCard: {
-      flex: 1,
-      marginHorizontal: 6,
-      alignItems: 'center',
-      paddingVertical: 12,
-    },
-    statsLabel: {
-      fontSize: 14,
-      color: Colors.subtleTextColor,
-      marginBottom: 2,
-    },
-    statsValue: {
-      fontSize: 20,
-      fontWeight: 'bold',
-      color: Colors.primaryGreen,
-    },
+  memberSince: {
+    fontSize: 13,
+    color: Colors.subtleTextColor,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+  },
+  statsCard: {
+    flex: 1,
+    marginHorizontal: 6,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  statsLabel: {
+    fontSize: 14,
+    color: Colors.subtleTextColor,
+    marginBottom: 2,
+  },
+  statsValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: Colors.primaryGreen,
+  },
 });

@@ -1,10 +1,11 @@
 // Firebase初期化用
 import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCiQEl32n27QLLof8l5Wzj1cD-qsudYw-M',
-  authDomain: '', // Android用は空でOK
+  authDomain: 'androidappkin.firebaseapp.com',
   projectId: 'androidappkin',
   storageBucket: 'androidappkin.firebasestorage.app',
   messagingSenderId: '653787721618',
@@ -12,4 +13,5 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
 export const db = getFirestore(app);

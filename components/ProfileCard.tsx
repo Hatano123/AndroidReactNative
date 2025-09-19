@@ -20,7 +20,7 @@ export default function ProfileCard({ nickname, iconUri, onNicknameChange, onIco
         <Text style={styles.nickname}>{nickname}</Text>
         <Text style={styles.title}>3-Day Traveler</Text>
       </View>
-      <TouchableOpacity style={styles.editButton}>
+      <TouchableOpacity style={styles.editButton} onPress={() => {}}>
         <Text style={styles.editButtonText}>編集</Text>
       </TouchableOpacity>
     </View>

@@ -84,7 +84,10 @@ export default function PostItem({
         <Text style={styles.comment}>{comment}</Text>
         <View style={styles.actionRow}>
           <Text style={styles.actionText}>コメント</Text>
-          <TouchableOpacity style={styles.likeBtn} onPress={handleLike}>
+          <TouchableOpacity 
+            style={styles.likeBtn} 
+            onPress={handleLike}
+          >
             <Text style={{ fontSize: 18, color: liked ? '#e74c3c' : '#bbb', marginRight: 4 }}>❤️</Text>
             <Text style={styles.likeCount}>{likeCount}</Text>
           </TouchableOpacity>

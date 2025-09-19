@@ -1,24 +1,27 @@
 import { Colors } from '@/constants/theme';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/contexts/AuthContext';
 import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 interface LoginButtonProps {
   style?: any;
 }
 
 export default function LoginButton({ style }: LoginButtonProps) {
-  const { user, loading, signIn, logout } = useAuth();
+  const { user, loading, signInWithGoogle, logout } = useAuth();
 
   const handlePress = async () => {
     try {
       if (user) {
         await logout();
+        Alert.alert('ログアウト', 'ログアウトしました');
       } else {
-        await signIn();
+        await signInWithGoogle();
+        Alert.alert('ログイン', 'ログインしました');
       }
     } catch (error) {
       console.error('認証エラー:', error);
+      Alert.alert('エラー', '認証に失敗しました。もう一度お試しください。');
     }
   };
 
@@ -55,6 +58,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
-
-

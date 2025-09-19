@@ -1,16 +1,16 @@
-import { app } from '@/constants/firebaseConfig';
+import { app, auth } from '@/constants/firebaseConfig';
 import { Activity, ActivitySummary, CreateActivityData, UpdateActivityData } from '@/types/activity';
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDocs,
-    getFirestore,
-    query,
-    Timestamp,
-    updateDoc,
-    where
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  getFirestore,
+  query,
+  Timestamp,
+  updateDoc,
+  where
 } from 'firebase/firestore';
 
 const db = getFirestore(app);
@@ -19,9 +19,9 @@ export class ActivityService {
   private static readonly COLLECTION_NAME = 'activities';
 
   // 活動記録を作成
-  static async createActivity(activityData: CreateActivityData): Promise<string> {
-    try {
-      const userId = 'guest';
+    static async createActivity(activityData: CreateActivityData): Promise<string> {
+        try {
+            const userId = auth.currentUser?.uid || 'guest';
       
       const activity: Omit<Activity, 'id'> = {
         userId,
@@ -31,7 +31,7 @@ export class ActivityService {
         timestamp: new Date(`${activityData.date}T${activityData.startTime}`).getTime(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        notes: activityData.notes,
+        notes: activityData.notes || '',
       };
 
       const docRef = await addDoc(collection(db, 'users', userId, this.COLLECTION_NAME), {
@@ -48,9 +48,9 @@ export class ActivityService {
   }
 
   // 特定の日の活動記録を取得
-  static async getActivitiesByDate(date: string): Promise<Activity[]> {
-    try {
-      const userId = 'guest';
+    static async getActivitiesByDate(date: string): Promise<Activity[]> {
+        try {
+            const userId = auth.currentUser?.uid || 'guest';
       const q = query(
         collection(db, 'users', userId, this.COLLECTION_NAME),
         where('date', '==', date)
@@ -68,8 +68,8 @@ export class ActivityService {
           startTime: data.startTime,
           duration: data.duration,
           timestamp: data.timestamp,
-          createdAt: data.createdAt.toDate(),
-          updatedAt: data.updatedAt.toDate(),
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(),
           notes: data.notes,
         });
       });
@@ -85,7 +85,7 @@ export class ActivityService {
   // 月間の活動記録を取得
   static async getActivitiesByMonth(year: number, month: number): Promise<ActivitySummary[]> {
     try {
-      const userId = 'guest';
+      const userId = auth.currentUser?.uid || 'guest';
       const startDate = `${year}-${month.toString().padStart(2, '0')}-01`;
       const endDate = `${year}-${(month + 1).toString().padStart(2, '0')}-01`;
       
@@ -107,8 +107,8 @@ export class ActivityService {
           startTime: data.startTime,
           duration: data.duration,
           timestamp: data.timestamp,
-          createdAt: data.createdAt.toDate(),
-          updatedAt: data.updatedAt.toDate(),
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(),
           notes: data.notes,
         };
 
@@ -143,12 +143,25 @@ export class ActivityService {
   // 活動記録を更新
   static async updateActivity(activityId: string, updateData: UpdateActivityData): Promise<void> {
     try {
-      const userId = 'guest';
+      const userId = auth.currentUser?.uid || 'guest';
       const activityRef = doc(db, 'users', userId, this.COLLECTION_NAME, activityId);
-      await updateDoc(activityRef, {
-        ...updateData,
+      
+      // Filter out undefined values and ensure notes is a string
+      const cleanUpdateData: any = {
         updatedAt: Timestamp.fromDate(new Date()),
-      });
+      };
+      
+      if (updateData.startTime !== undefined) {
+        cleanUpdateData.startTime = updateData.startTime;
+      }
+      if (updateData.duration !== undefined) {
+        cleanUpdateData.duration = updateData.duration;
+      }
+      if (updateData.notes !== undefined) {
+        cleanUpdateData.notes = updateData.notes || '';
+      }
+      
+      await updateDoc(activityRef, cleanUpdateData);
     } catch (error) {
       console.error('活動記録の更新に失敗しました:', error);
       throw error;
@@ -158,7 +171,7 @@ export class ActivityService {
   // 活動記録を削除
   static async deleteActivity(activityId: string): Promise<void> {
     try {
-      const userId = 'guest';
+      const userId = auth.currentUser?.uid || 'guest';
       const activityRef = doc(db, 'users', userId, this.COLLECTION_NAME, activityId);
       await deleteDoc(activityRef);
     } catch (error) {
@@ -170,7 +183,7 @@ export class ActivityService {
   // 週間の活動記録を取得
   static async getWeeklyActivities(startDate: string): Promise<ActivitySummary[]> {
     try {
-      const userId = 'guest';
+      const userId = auth.currentUser?.uid || 'guest';
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + 6);
       const endDateString = endDate.toISOString().split('T')[0];
@@ -193,8 +206,8 @@ export class ActivityService {
           startTime: data.startTime,
           duration: data.duration,
           timestamp: data.timestamp,
-          createdAt: data.createdAt.toDate(),
-          updatedAt: data.updatedAt.toDate(),
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : new Date(),
           notes: data.notes,
         };
 
