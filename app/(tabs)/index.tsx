@@ -3,16 +3,14 @@ import { Alert, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpac
 import EditProfileModal from '@/components/EditProfileModal';
 import LoginButton from '@/components/LoginButton';
 import SocialConnections from '@/components/SocialConnections';
-import { db } from '@/constants/firebaseConfig';
 import { Colors } from '@/constants/theme';
-import { useAuth } from '@/contexts/AuthContext';
 import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, updateDoc, where, writeBatch } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
+import { db } from '../../constants/firebaseConfig';
 
 
 export default function IndexScreen() {
-  const { user } = useAuth();
   const [isModalVisible, setModalVisible] = useState(false);
   const [userNickname, setUserNickname] = useState('Alex');
   const [userIconUri, setUserIconUri] = useState('https://randomuser.me/api/portraits/men/1.jpg');
@@ -22,7 +20,7 @@ export default function IndexScreen() {
 
   useEffect(() => {
     const fetchUserProfile = async () => {
-      const userId = user?.uid || 'guest';
+      const userId = 'guest';
       const userDocRef = doc(db, 'users', userId);
       const userDocSnap = await getDoc(userDocRef);
 
@@ -104,10 +102,10 @@ export default function IndexScreen() {
         <View style={styles.headerRow}>
           <Text style={styles.pageTitle}>マイページ</Text>
           <View style={styles.headerButtons}>
-            <LoginButton style={styles.loginButton} />
             <TouchableOpacity style={styles.editProfileBtnHeader} onPress={() => setModalVisible(true)}>
               <Text style={styles.editProfileText}>プロフィール編集</Text>
             </TouchableOpacity>
+            <LoginButton style={styles.loginButton} showProviderOptions={true} />
           </View>
         </View>
         <View style={styles.profileCard}>
@@ -134,6 +132,29 @@ export default function IndexScreen() {
           <View style={styles.statsCard}>
             <Text style={styles.statsLabel}>Total Days</Text>
             <Text style={styles.statsValue}>{totalDays}</Text>
+          </View>
+        </View>
+
+        {/* 称号セクション */}
+        <View style={styles.titlesSection}>
+          <Text style={styles.sectionTitle}>獲得した称号</Text>
+          <View style={styles.titlesList}>
+            <View style={styles.titleItem}>
+              <Text style={styles.titleName}>初心</Text>
+              <Text style={styles.titleDescription}>初回記録達成</Text>
+            </View>
+            <View style={styles.titleItem}>
+              <Text style={styles.titleName}>3日の旅人</Text>
+              <Text style={styles.titleDescription}>3日連続達成</Text>
+            </View>
+            <View style={styles.titleItem}>
+              <Text style={styles.titleName}>鋼の意志</Text>
+              <Text style={styles.titleDescription}>7日連続達成</Text>
+            </View>
+            <View style={styles.titleItem}>
+              <Text style={styles.titleName}>不屈の精神</Text>
+              <Text style={styles.titleDescription}>30日連続達成</Text>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -163,11 +184,10 @@ const styles = StyleSheet.create({
   headerButtons: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   loginButton: {
-    minWidth: 70,
-    paddingHorizontal: 12,
+    marginLeft: 0,
   },
   editProfileBtnHeader: {
     backgroundColor: '#555',
@@ -290,5 +310,46 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: Colors.primaryGreen,
+  },
+  titlesSection: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 8,
+    marginBottom: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.textColor,
+    marginBottom: 16,
+  },
+  titlesList: {
+    gap: 12,
+  },
+  titleItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: Colors.lightGreenBackground,
+    borderRadius: 8,
+  },
+  titleName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.primaryGreen,
+    marginRight: 12,
+    minWidth: 80,
+  },
+  titleDescription: {
+    fontSize: 14,
+    color: Colors.subtleTextColor,
+    flex: 1,
   },
 });
